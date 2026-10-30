@@ -1,0 +1,35 @@
+// Interface State
+public interface EstadoConta {
+    void depositar(ContaBancaria conta, BigDecimal valor);
+    void sacar(ContaBancaria conta, BigDecimal valor);
+}
+
+// Estado: Conta Ativa
+public class ContaAtiva implements EstadoConta {
+    @Override
+    public void depositar(ContaBancaria conta, BigDecimal valor) {
+        conta.setSaldo(conta.getSaldo().add(valor));
+    }
+
+    @Override
+    public void sacar(ContaBancaria conta, BigDecimal valor) {
+        if (conta.getSaldo().compareTo(valor) < 0) {
+            throw new SaldoInsuficienteException("Saldo insuficiente.");
+        }
+        conta.setSaldo(conta.getSaldo().subtract(valor));
+    }
+}
+
+// Estado: Conta Bloqueada
+public class ContaBloqueada implements EstadoConta {
+    @Override
+    public void depositar(ContaBancaria conta, BigDecimal valor) {
+        // Permitimos depósito para recuperar a conta, mas bloqueamos saques
+        conta.setSaldo(conta.getSaldo().add(valor));
+    }
+
+    @Override
+    public void sacar(ContaBancaria conta, BigDecimal valor) {
+        throw new IllegalStateException("Conta bloqueada. Operação de saque não permitida.");
+    }
+}
